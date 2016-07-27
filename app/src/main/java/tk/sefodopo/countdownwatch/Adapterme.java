@@ -1,3 +1,5 @@
+package tk.sefodopo.countdownwatch;
+
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.view.View;
@@ -15,7 +17,7 @@ public class Adapterme implements ListAdapter {
 	// TODO call observers
 
 	public class Item {
-		Date
+
 	}
 
 	public Adapterme(Context context) {
