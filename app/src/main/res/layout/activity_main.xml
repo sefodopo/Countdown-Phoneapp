@@ -8,18 +8,77 @@
     tools:context="tk.sefodopo.countdownwatch.MainActivity"
     style="@style/Theme.AppCompat.NoActionBar">
 
-    <android.support.v7.widget.Toolbar
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:id="@+id/toolBar"
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/toolbar"
+        android:padding="10dp"
         android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
+        android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/toolbarButtons"
+            android:layout_centerHorizontal="true">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView_first"
+                android:src="@drawable/ic_first_accent_48dp"
+                android:minHeight="32dp"
+                android:minWidth="32dp"
+                android:contentDescription="@string/action_first"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:onClick="onClickImageView1" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView_second"
+                android:layout_toRightOf="@+id/imageView_first"
+                android:src="@drawable/ic_second_white_48dp"
+                android:contentDescription="@string/action_second"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:minHeight="32dp"
+                android:minWidth="32dp"
+                android:onClick="onClickImageView2" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView_third"
+                android:layout_toRightOf="@+id/imageView_second"
+                android:src="@drawable/ic_third_white_48dp"
+                android:contentDescription="@string/action_third"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:minHeight="32dp"
+                android:minWidth="32dp"
+                android:onClick="onClickImageView3" />
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView_more"
+            android:src="@drawable/ic_more_white"
+            android:minHeight="32dp"
+            android:clickable="false"
+            android:contentDescription="@string/more"
+            android:layout_alignParentRight="true"
+            android:minWidth="32dp"
+            android:onClick="onClickMore" />
+
+    </RelativeLayout>
 
     <android.support.v7.widget.ListViewCompat
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/listView"
-        android:layout_below="@+id/toolBar"/>
+        android:layout_below="@+id/toolbar" />
 
 </RelativeLayout>

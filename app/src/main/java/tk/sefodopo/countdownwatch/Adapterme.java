@@ -2,9 +2,12 @@ package tk.sefodopo.countdownwatch;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListAdapter;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -15,14 +18,28 @@ public class Adapterme implements ListAdapter {
 	private Context context;
 	private ArrayList<DataSetObserver> observers;
 	// TODO call observers
-
-	public class Item {
-
-	}
+	private ArrayList<Item> items;
 
 	public Adapterme(Context context) {
 		this.context = context;
 		observers = new ArrayList<>();
+		items = new ArrayList<>();
+	}
+
+	public void addItem(Item item) {
+		items.add(item);
+		for (DataSetObserver observer: observers
+			 ) {
+			observer.onChanged();
+		}
+	}
+
+	public void removeItem(Item item) {
+		items.remove(item);
+		for (DataSetObserver observer: observers)
+		{
+			observer.onChanged();
+		}
 	}
 
 	@Override
@@ -32,8 +49,7 @@ public class Adapterme implements ListAdapter {
 
 	@Override
 	public boolean isEnabled(int position) {
-		// TODO check if is enabled
-		return false;
+		return items.size() - 1 >= position;
 	}
 
 	@Override
@@ -48,44 +64,49 @@ public class Adapterme implements ListAdapter {
 
 	@Override
 	public int getCount() {
-		// TODO count object in an array for the count
-		return 0;
+		return items.size();
 	}
 
 	@Override
 	public Object getItem(int i) {
-		// TODO get object from array for getItem
-		return null;
+		if (items.size() - 1 < i) return null;
+		else {
+			return items.get(i);
+		}
 	}
 
 	@Override
 	public long getItemId(int i) {
-		// TODO look up what this is supposed to do
-		return 0;
+		return i;
 	}
 
 	@Override
 	public boolean hasStableIds() {
-		// TODO look this up to find out what to do with this.
 		return false;
 	}
 
 	@Override
 	public View getView(int i, View view, ViewGroup viewGroup) {
-		// TODO look up and create a view to be shown probably
-		return null;
+		LayoutInflater inflator = LayoutInflater.from(context);
+		view = inflator.inflate(R.layout.adapter_item, viewGroup, false);
+		TextView title = (TextView) view.findViewById(R.id.title);
+		TextView date = (TextView) view.findViewById(R.id.date);
+		TextView time = (TextView) view.findViewById(R.id.time);
+		Item item = (Item) getItem(i);
+		title.setText(item.getTitle());
+		date.setText(item.getDate().toString());
+		time.setText("");
+		return view;
 	}
 
 	@Override
 	public int getItemViewType(int i) {
-		// TODO look this up and set it up properly
 		return 0;
 	}
 
 	@Override
 	public int getViewTypeCount() {
-		// TODO look this up and set it up properly.
-		return 0;
+		return 1;
 	}
 
 	@Override
