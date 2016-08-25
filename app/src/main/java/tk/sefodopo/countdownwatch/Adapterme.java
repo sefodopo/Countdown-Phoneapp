@@ -5,7 +5,6 @@ import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
@@ -17,29 +16,30 @@ import java.util.ArrayList;
 public class Adapterme implements ListAdapter {
 	private Context context;
 	private ArrayList<DataSetObserver> observers;
-	// TODO call observers
-	private ArrayList<Item> items;
+	private ArrayList<Event> events;
 
 	public Adapterme(Context context) {
 		this.context = context;
 		observers = new ArrayList<>();
-		items = new ArrayList<>();
+		events = new ArrayList<>();
 	}
 
-	public void addItem(Item item) {
-		items.add(item);
-		for (DataSetObserver observer: observers
-			 ) {
+	public void addEvent(Event item) {
+		events.add(item);
+		for (DataSetObserver observer: observers) {
 			observer.onChanged();
 		}
 	}
 
-	public void removeItem(Item item) {
-		items.remove(item);
-		for (DataSetObserver observer: observers)
-		{
+	public void removeEvent(int item) {
+		events.remove(item);
+		for (DataSetObserver observer: observers) {
 			observer.onChanged();
 		}
+	}
+
+	public ArrayList<Event> getList() {
+		return events;
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class Adapterme implements ListAdapter {
 
 	@Override
 	public boolean isEnabled(int position) {
-		return items.size() - 1 >= position;
+		return events.size() - 1 >= position;
 	}
 
 	@Override
@@ -64,14 +64,14 @@ public class Adapterme implements ListAdapter {
 
 	@Override
 	public int getCount() {
-		return items.size();
+		return events.size();
 	}
 
 	@Override
 	public Object getItem(int i) {
-		if (items.size() - 1 < i) return null;
+		if (events.size() - 1 < i) return null;
 		else {
-			return items.get(i);
+			return events.get(i);
 		}
 	}
 
@@ -90,12 +90,10 @@ public class Adapterme implements ListAdapter {
 		LayoutInflater inflator = LayoutInflater.from(context);
 		view = inflator.inflate(R.layout.adapter_item, viewGroup, false);
 		TextView title = (TextView) view.findViewById(R.id.title);
-		TextView date = (TextView) view.findViewById(R.id.date);
 		TextView time = (TextView) view.findViewById(R.id.time);
-		Item item = (Item) getItem(i);
-		title.setText(item.getTitle());
-		date.setText(item.getDate().toString());
-		time.setText("");
+		Event event = (Event) getItem(i);
+		title.setText(event.getTitle());
+		time.setText(event.getTime());
 		return view;
 	}
 

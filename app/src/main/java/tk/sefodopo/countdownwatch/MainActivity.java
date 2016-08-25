@@ -1,7 +1,9 @@
 package tk.sefodopo.countdownwatch;
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -10,11 +12,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListViewCompat;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
+
+import com.getpebble.android.kit.PebbleKit;
+import com.getpebble.android.kit.util.PebbleDictionary;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener, ActionAddFragment.ActionAddListener {
 
@@ -24,6 +38,25 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 	private Drawable[] imageViewActives;
 	private Drawable[] imageViewWhites;
 	private short currentAdapterNumber;
+	private static final String STATE_LIST = "State list";
+
+	final UUID appUuid = UUID.fromString("cedd426f-f98b-4bce-94e1-4a4f38668378");
+	final int AppKeyLayersEnabled = 0;
+	final int AppKeyDateLayer = 1;
+	final int AppKeyFirstEventTitle = 2;
+	final int AppKeyFirstEventTime = 3;
+	final int AppKeySecondEventTitle = 4;
+	final int AppKeySecondEventTime = 5;
+	final int AppKeyThirdEventTitle = 6;
+	final int AppKeyThirdEventTime = 7;
+	final int AppKeyEventsEnabled = 8;
+	final int AppKeyStartFontSize = 9;
+	final int AppKeyFirstEventCount = 16;
+	final int AppKeySecondEventCount = 17;
+	final int AppKeyThirdEventCount = 18;
+	final int AppKeyStartFirstEvents = 100;
+	final int AppKeyStartSecondEvents = 140;
+	final int AppKeyStartThirdEvents = 160;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +68,23 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 		adapter2 = new Adapterme(this);
 		adapter3 = new Adapterme(this);
 		listView.setAdapter(adapter1);
+		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+				builder.setMessage("Remove?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int ii) {
+						getCurrentAdapter().removeEvent(i);
+					}
+				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i) {
+						dialogInterface.cancel();
+					}
+				}).show();
+			}
+		});
 		currentAdapterNumber = 1;
 		Resources resources = getResources();
 		imageViewActives = new Drawable[] {
@@ -120,7 +170,60 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog) {
+		EditText title = (EditText) dialog.getDialog().findViewById(R.id.title);
+		EditText time = (EditText) dialog.getDialog().findViewById(R.id.time);
+		EditText date = (EditText) dialog.getDialog().findViewById(R.id.date);
+		Adapterme adapter = getCurrentAdapter();
+		Date date1;
+		SimpleDateFormat df = new SimpleDateFormat("HH:mmMM/dd/yyyy");
+		try {
+			date1 = df.parse(time.getText().toString() + date.getText().toString());
+			adapter.addEvent(new Event(title.getText().toString(), date1));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
 
+	private void onClickDinner() {
+//		PebbleDictionary dict = new PebbleDictionary();
+//		dict.addUint8(AppKeyLayersEnabled, (byte) 3);
+//		dict.addUint8(AppKeyDateLayer, (byte) 2);
+//		dict.addUint8(AppKeyFirstEventTime, (byte) 1);
+//		dict.addUint8(AppKeyFirstEventTitle, (byte) 0);
+//		dict.addUint8(AppKeyEventsEnabled, (byte) 1);
+//		dict.addUint8(AppKeyStartFontSize, (byte) 1);
+//		dict.addUint8(AppKeyStartFontSize + 1, (byte) 2);
+//		dict.addUint8(AppKeyStartFontSize + 2, (byte) 0);
+//		dict.addUint8(AppKeyFirstEventCount, (byte) event.length);
+//		int temp = 0;
+//		for (int i = 0; i < event.length; i++) {
+//			dict.addString(AppKeyStartFirstEvents + temp, event[i].title);
+//			temp++;
+//			dict.addUint32(AppKeyStartFirstEvents + temp, (int) event[i].seconds);
+//			temp++;
+//		}
+//		PebbleKit.sendDataToPebble(getApplicationContext(), appUuid, dict);
+	}
+
+	private void send() {
+		PebbleDictionary dict = new PebbleDictionary();
+		dict.addUint8(AppKeyLayersEnabled, (byte)3);
+		dict.addUint8(AppKeyDateLayer, (byte)2);
+		dict.addUint8(AppKeyFirstEventTime, (byte)1);
+		dict.addUint8(AppKeyFirstEventTitle, (byte)0);
+		dict.addUint8(AppKeyEventsEnabled, (byte)1);
+		dict.addUint8(AppKeyStartFontSize, (byte)1);
+		dict.addUint8(AppKeyStartFontSize + 1, (byte)2);
+		dict.addUint8(AppKeyStartFontSize + 2, (byte)0);
+		dict.addUint8(AppKeyFirstEventCount, (byte) getCurrentAdapter().getCount());
+		int temp = 0;
+		for (int i = 0; i < 20 && i < getCurrentAdapter().getCount(); i++) {
+			dict.addString(AppKeyStartFirstEvents + temp, ((Event)getCurrentAdapter().getItem(i)).getTitle());
+			temp++;
+			dict.addUint32(AppKeyStartFirstEvents + temp, ((Event)getCurrentAdapter().getItem(i)).getSeconds());
+			temp++;
+		}
+		PebbleKit.sendDataToPebble(getApplicationContext(), appUuid, dict);
 	}
 
 	@Override
@@ -131,8 +234,20 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 				return true;
 			case R.id.action_settings:
 				return true;
+			case R.id.action_dinner:
+				onClickDinner();
+				return true;
+			case R.id.action_send:
+				send();
+				return true;
 			default:
 				return false;
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		//outState.putParcelableArrayList(STATE_LIST, getCurrentAdapter().getList());
 	}
 }

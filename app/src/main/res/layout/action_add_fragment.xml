@@ -13,16 +13,18 @@
         android:inputType="text"
         android:hint="@string/action_add_fragment_title_hint"/>
 
-    <TextView
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/time"/>
+        android:ems="10"
+        android:id="@+id/time"
+        android:inputType="time"/>
 
-    <TextView
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:inputType="date"
+        android:ems="10"
         android:id="@+id/date"/>
 
 </LinearLayout>
