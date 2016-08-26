@@ -9,9 +9,12 @@
         android:id="@+id/action_settings"
         android:title="@string/action_settings"/>
     <item
-        android:id="@+id/action_dinner"
-        android:title="Dinner"/>
-    <item
         android:id="@+id/action_send"
         android:title="Send"/>
+    <item
+        android:id="@+id/action_save"
+        android:title="Save"/>
+    <item
+        android:id="@+id/action_load"
+        android:title="Load"/>
 </menu>

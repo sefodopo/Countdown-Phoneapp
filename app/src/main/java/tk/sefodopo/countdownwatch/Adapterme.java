@@ -25,7 +25,16 @@ public class Adapterme implements ListAdapter {
 	}
 
 	public void addEvent(Event item) {
-		events.add(item);
+		int i;
+		for (i = 0; i < events.size(); i++) {
+			if (events.get(i).getDate().compareTo(item.getDate()) == 0) {
+				return;
+			}
+			if (events.get(i).getDate().compareTo(item.getDate()) > 0) {
+				break;
+			}
+		}
+		events.add(i, item);
 		for (DataSetObserver observer: observers) {
 			observer.onChanged();
 		}

@@ -3,10 +3,12 @@ package tk.sefodopo.countdownwatch;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListViewCompat;
@@ -24,11 +26,27 @@ import android.widget.ImageView;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.Console;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener, ActionAddFragment.ActionAddListener {
 
@@ -97,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 				resources.getDrawable(R.drawable.ic_second_white_48dp),
 				resources.getDrawable(R.drawable.ic_third_white_48dp)
 		};
+		load();
 	}
 
 	private Adapterme getCurrentAdapter() {
@@ -226,6 +245,84 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 		PebbleKit.sendDataToPebble(getApplicationContext(), appUuid, dict);
 	}
 
+	private void save() {
+		Document dom;
+		Element e = null, ee = null;
+
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			dom = db.newDocument();
+			Element rootEle = dom.createElement("root");
+			for (int i = 1; i < 4; i++) {
+				e = dom.createElement("adapter");
+				ArrayList<Event> ale;
+				switch (i) {
+					case 1:
+						ale = adapter1.getList();
+						break;
+					case 2:
+						ale = adapter2.getList();
+						break;
+					case 3:
+						ale = adapter3.getList();
+						break;
+					default:
+						return;
+				}
+				for (Event event : ale) {
+					ee = dom.createElement("event");
+					Element eee = dom.createElement("title");
+					eee.setTextContent(event.getTitle());
+					ee.appendChild(eee);
+					eee = dom.createElement("time");
+					SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+					eee.setTextContent(df.format(event.getDate()));
+					ee.appendChild(eee);
+					e.appendChild(ee);
+				}
+				rootEle.appendChild(e);
+			}
+			dom.appendChild(rootEle);
+
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(dom);
+			StreamResult result = new StreamResult(new File(Environment.getExternalStorageDirectory() + "/mainadapter.xml"));
+			transformer.transform(source, result);
+		} catch (Exception ec) {
+			ec.printStackTrace();
+		}
+	}
+
+	private void load() {
+		try {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document doc = db.parse(new File(Environment.getExternalStorageDirectory() + "/mainadapter.xml"));
+			doc.getDocumentElement().normalize();
+			NodeList nl = doc.getElementsByTagName("adapter");
+			for (int i = 0; i < nl.getLength() && i < 4; i++) {
+				currentAdapterNumber = (short)(i + 1);
+				Element eAdapter = (Element) nl.item(i);
+				NodeList nlEvents = eAdapter.getElementsByTagName("event");
+				for (int ii = 0; ii < nlEvents.getLength(); ii++) {
+					Element eEvent = (Element) nlEvents.item(ii);
+					NodeList nlT = eEvent.getElementsByTagName("title");
+					Element eT = (Element) nlT.item(0);
+					nlT = eEvent.getElementsByTagName("time");
+					Element eTT = (Element) nlT.item(0);
+					SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+					getCurrentAdapter().addEvent(new Event(eT.getTextContent(), df.parse(eTT.getTextContent())));
+				}
+			}
+			currentAdapterNumber = 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public boolean onMenuItemClick(MenuItem item) {
 		switch (item.getItemId()) {
@@ -234,11 +331,14 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 				return true;
 			case R.id.action_settings:
 				return true;
-			case R.id.action_dinner:
-				onClickDinner();
-				return true;
 			case R.id.action_send:
 				send();
+				return true;
+			case R.id.action_save:
+				save();
+				return true;
+			case R.id.action_load:
+				load();
 				return true;
 			default:
 				return false;

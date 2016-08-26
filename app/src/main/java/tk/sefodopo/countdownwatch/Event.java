@@ -1,15 +1,12 @@
 package tk.sefodopo.countdownwatch;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * Created by zandj on 8/24/2016.
  */
-public class Event implements Parcelable {
+public class Event {
 	private String title;
 	private Date date;
 
@@ -35,27 +32,7 @@ public class Event implements Parcelable {
 		return df.format(date);
 	}
 
-	public Event(Parcel in) {
-		title = in.readString();
-		date = new Date(in.readInt());
+	public Date getDate() {
+		return date;
 	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel parcel, int i) {
-		parcel.writeString(title);
-		parcel.writeLong(date.getTime());
-	}
-	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-		public Event createFromParcel(Parcel in) {
-			return new Event(in);
-		}
-		public Event[] newArray(int size) {
-			return new Event[size];
-		}
-	};
 }
