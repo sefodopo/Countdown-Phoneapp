@@ -13,12 +13,12 @@ import java.util.ArrayList;
 /**
  * Created by zandj on 7/23/2016.
  */
-public class Adapterme implements ListAdapter {
+public class MyAdapter implements ListAdapter {
 	private Context context;
 	private ArrayList<DataSetObserver> observers;
 	private ArrayList<Event> events;
 
-	public Adapterme(Context context) {
+	public MyAdapter(Context context) {
 		this.context = context;
 		observers = new ArrayList<>();
 		events = new ArrayList<>();

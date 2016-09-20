@@ -1,9 +1,7 @@
 package tk.sefodopo.countdownwatch;
 
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -13,10 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListViewCompat;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,13 +22,9 @@ import com.getpebble.android.kit.util.PebbleDictionary;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.Console;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,9 +40,9 @@ import javax.xml.transform.stream.StreamResult;
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener, ActionAddFragment.ActionAddListener {
 
-	private Adapterme adapter1;
-	private Adapterme adapter2;
-	private Adapterme adapter3;
+	private MyAdapter adapter1;
+	private MyAdapter adapter2;
+	private MyAdapter adapter3;
 	private Drawable[] imageViewActives;
 	private Drawable[] imageViewWhites;
 	private short currentAdapterNumber;
@@ -82,9 +72,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 		setContentView(R.layout.activity_main);
 		setTitle(R.string.title_main_activity);
 		ListViewCompat listView = (ListViewCompat) findViewById(R.id.listView);
-		adapter1 = new Adapterme(this);
-		adapter2 = new Adapterme(this);
-		adapter3 = new Adapterme(this);
+		adapter1 = new MyAdapter(this);
+		adapter2 = new MyAdapter(this);
+		adapter3 = new MyAdapter(this);
 		listView.setAdapter(adapter1);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -118,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 		load();
 	}
 
-	private Adapterme getCurrentAdapter() {
+	private MyAdapter getCurrentAdapter() {
 		switch (currentAdapterNumber) {
 			case 1:
 				return adapter1;
@@ -192,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 		EditText title = (EditText) dialog.getDialog().findViewById(R.id.title);
 		EditText time = (EditText) dialog.getDialog().findViewById(R.id.time);
 		EditText date = (EditText) dialog.getDialog().findViewById(R.id.date);
-		Adapterme adapter = getCurrentAdapter();
+		MyAdapter adapter = getCurrentAdapter();
 		Date date1;
 		SimpleDateFormat df = new SimpleDateFormat("HH:mmMM/dd/yyyy");
 		try {

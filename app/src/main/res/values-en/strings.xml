@@ -13,4 +13,7 @@
     <string name="action_add_fragment_negative_button">Cancel</string>
     <string name="action_add_fragment_title_hint">Title</string>
     <string name="action_add_fragment_date_hint">Date</string>
+    <string name="title">Title</string>
+    <string name="save">Save</string>
+    <string name="add">Add</string>
 </resources>
